@@ -9,8 +9,8 @@
 class Affectation
 {
  public:
-	void hongrois();
-	explicit Affectation(const Matrice m);
+	void hongrois(const Matrice& m);
+	explicit Affectation(const Matrice& m);
 	virtual ~Affectation();
 	const std::vector<std::vector<int>>& get_matrice_de_base() const;
  private:
@@ -23,7 +23,6 @@ class Affectation
 	int find_min(std::vector<bool>& covered_rows, std::vector<bool>& covered_cols);
 	void substact_min(std::vector<bool>& covered_cols, std::vector<bool>& covered_rows, int min, int& step);
 	std::vector<int> find_solution();
-	bool cols_number_of_zeros(int col, int max_num_of_zeros, const std::vector<int>& vect_solution);
 	int rows_number_of_zeros(int row, int max_num_of_zeros, const std::vector<int>& vect_solution);
 	bool solution_found(const std::vector<int>& vect_solution);
 	int cols_number_of_zeros(int col);

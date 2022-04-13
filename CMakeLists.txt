@@ -3,4 +3,4 @@ project(affectation)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(affectation main.cpp Matrice.cpp Matrice.h Output.cpp Output.h Affectation.cpp Affectation.h)
+add_executable(affectation main.cpp Matrice.cpp Matrice.h Output.cpp Output.h Affectation.cpp Affectation.h ConsoleColor.h)

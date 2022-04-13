@@ -4,10 +4,11 @@
 #include <sstream>
 #include <numeric>
 #include "Affectation.h"
+#include "Output.h"
 
 //
 // Created by yassine on 10/04/2022.
-Affectation::Affectation(const Matrice m)
+Affectation::Affectation(const Matrice& m)
 {
 	for (auto& item: m.get_matrice_de_base())
 	{
@@ -16,8 +17,6 @@ Affectation::Affectation(const Matrice m)
 	size = matrice_hongroise_.size();
 }
 
-Affectation::~Affectation()
-= default;
 
 inline int index_of(const std::vector<int>& v, int item)
 {
@@ -29,14 +28,17 @@ inline int index_of(const std::vector<int>& v, int item)
 	return -1;
 }
 
-void Affectation::hongrois()
+void Affectation::hongrois(const Matrice& m)
 {
 	//TODO : jouter un check pour voir que c'est un matrice carré si non la transformer en matrice carré
 	int step{ 0 };
+
 	// Etape 1 & 2
+
 	reduction_rows_and_cols(step);
 	std::vector<bool> covered_cols(size, false);
 	std::vector<bool> covered_rows(size, false);
+
 	// Etape 3
 
 	bool done = false;
@@ -45,6 +47,7 @@ void Affectation::hongrois()
 		if (step == 3)
 		{
 			couverture_de_zeros(covered_cols, covered_rows, step);
+			Output::hashed_matric_print(matrice_hongroise_,covered_cols,covered_rows);
 		}
 		else if (step == 4)
 		{
@@ -55,6 +58,7 @@ void Affectation::hongrois()
 		else if (step == 5)
 		{
 			std::vector<int> sol = find_solution();
+			Output::print_solution(m,sol);
 			done = true;
 		}
 	}
@@ -169,11 +173,6 @@ std::vector<int> Affectation::find_solution()
 			{
 				vect_solution[i] = rows_number_of_zeros(i, max_num_de_zeros, vect_solution);
 			}
-			/*for (int j = 0; j < size; ++j)
-			{
-				if (vect_solution[i] == -1)
-					vect_solution[i] = rows_number_of_zeros(j, 1) ? j : -1;
-			}*/
 		}
 		++max_num_de_zeros;
 	}
@@ -263,3 +262,6 @@ bool Affectation::solution_found(const std::vector<int>& vect_solution)
 	}
 	return true;
 }
+
+Affectation::~Affectation()
+= default;

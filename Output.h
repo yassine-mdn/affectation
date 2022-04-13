@@ -10,11 +10,15 @@ class Output
 {
  public:
 	static void help();
-	static void pretty_matrix_print(std::vector<std::vector<float>>& m, std::string text ="");
-	static void output_matrix_to_file(std::vector<std::vector<float>>& m, std::string path, std::string title ="", std::string text ="");
-	static void intialize_file(std::string path);
+	static void pretty_matrix_print(std::vector<std::vector<int>>& m, std::string text = "");
+	static void hashed_matric_print(std::vector<std::vector<int>>& m,
+		std::vector<bool>& covered_cols,
+		std::vector<bool>& covered_rows,
+		std::string text = "");
+	static void print_solution(const Matrice& m,std::vector<int> sol);
  private:
 	static size_t number_of_digits(float n);
+	static size_t number_of_digits(std::string n);
 };
 
 #endif //DECISIONMAKINGPROJECT__OUTPUT_H_
