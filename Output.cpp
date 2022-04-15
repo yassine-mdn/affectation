@@ -13,7 +13,7 @@ using namespace std;
 void Output::help()
 {
 	cout << "resolution problem d'affectation\n\n"
-			"affectation [-h] [-g] [-i][filename] [-v] [-o][filename] [-W] [-L] [-H][coefficient] [-S] [-M] [-g]\n\n"
+			"affectation [-h] [-i][filename]\n\n"
 			"-h\tShows help page\n"
 			"-i\tTakes input file name\n\tall input files should be put in the input folder and be of the csv format\n";
 }
@@ -145,7 +145,7 @@ void Output::print_solution(const Matrice& m, std::vector<int> sol)
 	{
 		cout_min += m.get_matrice_de_base()[i][sol[i]];
 	}
-	cout<<"\nLe cout min est:"<<yellow<<cout_min<<endl;
+	cout<<"\nLe cout min est: "<<yellow<<cout_min<<endl;
 }
 size_t Output::number_of_digits(std::string n)
 {

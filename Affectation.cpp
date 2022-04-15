@@ -14,9 +14,8 @@ Affectation::Affectation(const Matrice& m)
 	{
 		matrice_hongroise_.push_back(item);
 	}
-	size = matrice_hongroise_.size();
+	size = static_cast<int> (matrice_hongroise_.size());
 }
-
 
 inline int index_of(const std::vector<int>& v, int item)
 {
@@ -28,9 +27,14 @@ inline int index_of(const std::vector<int>& v, int item)
 	return -1;
 }
 
+inline int calc_nbr_of_hashes(std::vector<bool> cols, std::vector<bool> rows)
+{
+	return (std::accumulate(cols.begin(), cols.end(), 0)
+		+ std::accumulate(rows.begin(), rows.end(), 0));
+}
+
 void Affectation::hongrois(const Matrice& m)
 {
-	//TODO : jouter un check pour voir que c'est un matrice carré si non la transformer en matrice carré
 	int step{ 0 };
 
 	// Etape 1 & 2
@@ -47,7 +51,7 @@ void Affectation::hongrois(const Matrice& m)
 		if (step == 3)
 		{
 			couverture_de_zeros(covered_cols, covered_rows, step);
-			Output::hashed_matric_print(matrice_hongroise_,covered_cols,covered_rows);
+			Output::hashed_matric_print(matrice_hongroise_, covered_cols, covered_rows);
 		}
 		else if (step == 4)
 		{
@@ -58,7 +62,7 @@ void Affectation::hongrois(const Matrice& m)
 		else if (step == 5)
 		{
 			std::vector<int> sol = find_solution();
-			Output::print_solution(m,sol);
+			Output::print_solution(m, sol);
 			done = true;
 		}
 	}
@@ -68,14 +72,14 @@ void Affectation::hongrois(const Matrice& m)
 void Affectation::reduction_rows_and_cols(int& step)
 {
 	std::vector<bool> col_has_zeros(size, false);
-	for (int i = 0; i < matrice_hongroise_.size(); ++i)
+	for (auto& i: matrice_hongroise_)
 	{
-		auto min_index = std::min_element(matrice_hongroise_.at(i).begin(), matrice_hongroise_.at(i).end());
+		auto min_index = std::min_element(i.begin(), i.end());
 		int min = static_cast<int>(*min_index);
-		col_has_zeros[(min_index - matrice_hongroise_.at(i).begin())] = true;
+		col_has_zeros[(min_index - i.begin())] = true;
 		for (int j = 0; j < size; ++j)
 		{
-			matrice_hongroise_[i][j] = matrice_hongroise_[i][j] - min;
+			i[j] = i[j] - min;
 		}
 	}
 
@@ -99,23 +103,21 @@ void Affectation::couverture_de_zeros(std::vector<bool>& covered_cols, std::vect
 	int nbr_of_hashes{ 0 };
 	for (int i = 0; i < size; ++i)
 	{
-		nbr_of_hashes = (std::accumulate(covered_rows.begin(), covered_rows.end(), 0)
-			+ std::accumulate(covered_cols.begin(), covered_cols.end(), 0));
+		nbr_of_hashes = calc_nbr_of_hashes(covered_rows, covered_cols);
 		for (int j = 0; j < size; ++j)
 		{
 			if (!covered_rows[j] && nbr_of_hashes != size)
 				covered_rows[j] = rows_number_of_zeros(j, size - i, covered_cols);
 		}
-		nbr_of_hashes = (std::accumulate(covered_rows.begin(), covered_rows.end(), 0)
-			+ std::accumulate(covered_cols.begin(), covered_cols.end(), 0));
+		nbr_of_hashes = calc_nbr_of_hashes(covered_rows, covered_cols);
 		for (int j = 0; j < size; ++j)
 		{
 			if (!covered_cols[j] && nbr_of_hashes != size)
 				covered_cols[j] = cols_number_of_zeros(j, size - i, covered_rows);
 		}
 	}
-	if ((std::accumulate(covered_rows.begin(), covered_rows.end(), 0)
-		+ std::accumulate(covered_cols.begin(), covered_cols.end(), 0)) == size)
+	nbr_of_hashes = calc_nbr_of_hashes(covered_rows, covered_cols);
+	if (nbr_of_hashes == size)
 		step = 5;
 	else
 		step = 4;
@@ -219,18 +221,18 @@ int Affectation::rows_number_of_zeros(int row, int max_num_of_zeros, const std::
 {
 	int couter{ 0 };
 	int index{ -1 };
-	for (int i = 0; i < size; ++i)
+	for (int i = 0; i < size; ++i)		//on parcour la ligne [row] de la matrice_hongroise_
 	{
-		if (matrice_hongroise_[row][i] == 0)
+		if (matrice_hongroise_[row][i] == 0)	//lorsqu'on trouve notre premier zero
 		{
-			if (cols_number_of_zeros(i) == 1)
+			if (cols_number_of_zeros(i) == 1)		//si c'est le seul zero dans cette colone on retourne son index
 				return i;
-			bool is_taken{ false };
+			bool is_taken{ false };						//is_taken permet de s'asuré que n'importe quel zero q'on trouve aprés n'est pas deja utiliser
 			for (int j = 0; j < size; ++j)
 			{
 				if (vect_solution.at(j) == i)
 				{
-					is_taken = true;
+					is_taken = true;				//si cette colone est deja reserver on continue de parcourir le vecteur
 					continue;
 				}
 			}
@@ -243,24 +245,16 @@ int Affectation::rows_number_of_zeros(int row, int max_num_of_zeros, const std::
 		}
 
 	}
-	if (couter == max_num_of_zeros)
+	if (couter == max_num_of_zeros)			//cette condition permet d'assurer que on fait la recherche des zero de maniere croissante pour eviter les conflit
 		return index;
 	else
 		return -1;
 }
 
-const std::vector<std::vector<int>>& Affectation::get_matrice_de_base() const
-{
-	return matrice_hongroise_;
-}
 bool Affectation::solution_found(const std::vector<int>& vect_solution)
 {
-	for (const auto& i: vect_solution)
-	{
-		if (i == -1)
-			return false;
-	}
-	return true;
+	return std::all_of(vect_solution.begin(), vect_solution.end(), [](int i)
+	{ return i != -1; });
 }
 
 Affectation::~Affectation()

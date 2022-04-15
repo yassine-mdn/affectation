@@ -7,7 +7,6 @@
 #include <sstream>
 #include <vector>
 #include <unordered_map>
-#include <cstring>
 
 using namespace std;
 
@@ -25,6 +24,9 @@ Matrice::Matrice(const std::string& path)
 		std::cout << "file name or path invalid\n";
 		return;
 	}
+	/*the next stipet of code is supposed to convert the raw csv data into our main matrix and col & row names
+	 * is_first_row is always true for first line of the csv file
+	 * is_first_element is only evaluated to true when accesing the fist element of every line starting from the second one */
 	bool is_first_row{ true};
 	bool is_first_element{ true};
 	while (file)
