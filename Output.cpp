@@ -74,7 +74,10 @@ void Output::hashed_matric_print(vector<std::vector<int>>& m,
 	{
 		for (int i = 0; i < m.size(); ++i)
 		{
-			if (covered_rows[j] || covered_cols[i])
+			if( (covered_rows[j] &&  covered_cols[i]) || covered_cols[i])
+				cout << (i == 0 ? "\n| " : "") << setw((int)maxColLen[i]) << blue << m[j][i] << white
+					 << (i == m.size() - 1 ? " |" : " ");
+			else if (covered_rows[j])
 				cout << (i == 0 ? "\n| " : "") << setw((int)maxColLen[i]) << red << m[j][i] << white
 					 << (i == m.size() - 1 ? " |" : " ");
 			else

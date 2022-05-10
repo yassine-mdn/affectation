@@ -14,7 +14,7 @@ class Affectation
 	virtual ~Affectation();
  private:
 	std::vector<std::vector<int>> matrice_hongroise_;
-	int size;
+	int size_;
 	void reduction_rows_and_cols(int& step);
 	void couverture_de_zeros(std::vector<bool>& covered_cols, std::vector<bool>& covered_rows, int& step);
 	bool cols_number_of_zeros(int col, int min_num_of_zeros, std::vector<bool>& covered_rows);

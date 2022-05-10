@@ -14,7 +14,7 @@ Affectation::Affectation(const Matrice& m)
 	{
 		matrice_hongroise_.push_back(item);
 	}
-	size = static_cast<int> (matrice_hongroise_.size());
+	size_ = static_cast<int> (matrice_hongroise_.size());
 }
 
 inline int index_of(const std::vector<int>& v, int item)
@@ -37,11 +37,11 @@ void Affectation::hongrois(const Matrice& m)
 {
 	int step{ 0 };
 
-	// Etape 1 & 2
+	// Etape 1 & 2 reduction de lignes et colones
 
 	reduction_rows_and_cols(step);
-	std::vector<bool> covered_cols(size, false);
-	std::vector<bool> covered_rows(size, false);
+	std::vector<bool> covered_cols(size_, false);
+	std::vector<bool> covered_rows(size_, false);
 
 	// Etape 3
 
@@ -71,19 +71,19 @@ void Affectation::hongrois(const Matrice& m)
 
 void Affectation::reduction_rows_and_cols(int& step)
 {
-	std::vector<bool> col_has_zeros(size, false);
+	std::vector<bool> col_has_zeros(size_, false);
 	for (auto& i: matrice_hongroise_)
 	{
 		auto min_index = std::min_element(i.begin(), i.end());
 		int min = static_cast<int>(*min_index);
 		col_has_zeros[(min_index - i.begin())] = true;
-		for (int j = 0; j < size; ++j)
+		for (int j = 0; j < size_; ++j)
 		{
 			i[j] = i[j] - min;
 		}
 	}
 
-	for (int i = 0; i < size; ++i)
+	for (int i = 0; i < size_; ++i)
 	{
 		if (!col_has_zeros[i])
 		{
@@ -101,23 +101,23 @@ void Affectation::reduction_rows_and_cols(int& step)
 void Affectation::couverture_de_zeros(std::vector<bool>& covered_cols, std::vector<bool>& covered_rows, int& step)
 {
 	int nbr_of_hashes{ 0 };
-	for (int i = 0; i < size; ++i)
+	for (int i = 0; i < size_; ++i)
 	{
 		nbr_of_hashes = calc_nbr_of_hashes(covered_rows, covered_cols);
-		for (int j = 0; j < size; ++j)
+		for (int j = 0; j < size_; ++j)
 		{
-			if (!covered_rows[j] && nbr_of_hashes != size)
-				covered_rows[j] = rows_number_of_zeros(j, size - i, covered_cols);
+			if (!covered_rows[j] && nbr_of_hashes != size_)
+				covered_rows[j] = rows_number_of_zeros(j, size_ - i, covered_cols);
 		}
 		nbr_of_hashes = calc_nbr_of_hashes(covered_rows, covered_cols);
-		for (int j = 0; j < size; ++j)
+		for (int j = 0; j < size_; ++j)
 		{
-			if (!covered_cols[j] && nbr_of_hashes != size)
-				covered_cols[j] = cols_number_of_zeros(j, size - i, covered_rows);
+			if (!covered_cols[j] && nbr_of_hashes != size_)
+				covered_cols[j] = cols_number_of_zeros(j, size_ - i, covered_rows);
 		}
 	}
 	nbr_of_hashes = calc_nbr_of_hashes(covered_rows, covered_cols);
-	if (nbr_of_hashes == size)
+	if (nbr_of_hashes == size_)
 		step = 5;
 	else
 		step = 4;
@@ -125,11 +125,11 @@ void Affectation::couverture_de_zeros(std::vector<bool>& covered_cols, std::vect
 int Affectation::find_min(std::vector<bool>& covered_rows, std::vector<bool>& covered_cols)
 {
 	int min{ INT16_MAX };
-	for (int i = 0; i < size; ++i)
+	for (int i = 0; i < size_; ++i)
 	{
 		if (!covered_rows[i])
 		{
-			for (int j = 0; j < size; ++j)
+			for (int j = 0; j < size_; ++j)
 			{
 				if (!covered_cols[j])
 				{
@@ -144,10 +144,10 @@ int Affectation::find_min(std::vector<bool>& covered_rows, std::vector<bool>& co
 
 void Affectation::substact_min(std::vector<bool>& covered_cols, std::vector<bool>& covered_rows, int min, int& step)
 {
-	for (int i = 0; i < size; ++i)
+	for (int i = 0; i < size_; ++i)
 	{
 
-		for (int j = 0; j < size; ++j)
+		for (int j = 0; j < size_; ++j)
 		{
 			if (!covered_cols[j] && !covered_rows[i])
 			{
@@ -165,11 +165,11 @@ void Affectation::substact_min(std::vector<bool>& covered_cols, std::vector<bool
 
 std::vector<int> Affectation::find_solution()
 {
-	std::vector<int> vect_solution(size, -1);
+	std::vector<int> vect_solution(size_, -1);
 	int max_num_de_zeros{ 1 };
-	while (!solution_found(vect_solution) || max_num_de_zeros < size)
+	while (max_num_de_zeros < size_ && !solution_found(vect_solution))
 	{
-		for (int i = 0; i < size; ++i)
+		for (int i = 0; i < size_; ++i)
 		{
 			if (vect_solution[i] == -1)
 			{
@@ -185,7 +185,7 @@ std::vector<int> Affectation::find_solution()
 bool Affectation::cols_number_of_zeros(int col, int min_num_of_zeros, std::vector<bool>& covered_rows)
 {
 	int couter{ 0 };
-	for (int i = 0; i < size; ++i)
+	for (int i = 0; i < size_; ++i)
 	{
 		if (matrice_hongroise_[i][col] == 0 && !covered_rows[i])
 			++couter;
@@ -196,7 +196,7 @@ bool Affectation::cols_number_of_zeros(int col, int min_num_of_zeros, std::vecto
 bool Affectation::rows_number_of_zeros(int row, int min_num_of_zeros, std::vector<bool>& covered_cols)
 {
 	int couter{ 0 };
-	for (int i = 0; i < size; ++i)
+	for (int i = 0; i < size_; ++i)
 	{
 		if (matrice_hongroise_[row][i] == 0 && !covered_cols[i])
 			++couter;
@@ -208,7 +208,7 @@ bool Affectation::rows_number_of_zeros(int row, int min_num_of_zeros, std::vecto
 int Affectation::cols_number_of_zeros(int col)
 {
 	int couter{ 0 };
-	for (int i = 0; i < size; ++i)
+	for (int i = 0; i < size_; ++i)
 	{
 		if (matrice_hongroise_[i][col] == 0)
 			++couter;
@@ -221,14 +221,14 @@ int Affectation::rows_number_of_zeros(int row, int max_num_of_zeros, const std::
 {
 	int couter{ 0 };
 	int index{ -1 };
-	for (int i = 0; i < size; ++i)		//on parcour la ligne [row] de la matrice_hongroise_
+	for (int i = 0; i < size_; ++i)		//on parcour la ligne [row] de la matrice_hongroise_
 	{
 		if (matrice_hongroise_[row][i] == 0)	//lorsqu'on trouve notre premier zero
 		{
 			if (cols_number_of_zeros(i) == 1)		//si c'est le seul zero dans cette colone on retourne son index
 				return i;
 			bool is_taken{ false };						//is_taken permet de s'asuré que n'importe quel zero q'on trouve aprés n'est pas deja utiliser
-			for (int j = 0; j < size; ++j)
+			for (int j = 0; j < size_; ++j)
 			{
 				if (vect_solution.at(j) == i)
 				{
