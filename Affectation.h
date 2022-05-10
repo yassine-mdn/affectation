@@ -6,6 +6,7 @@
 #define AFFECTATION__AFFECTATION_H_
 #include "Matrice.h"
 
+
 class Affectation
 {
  public:
